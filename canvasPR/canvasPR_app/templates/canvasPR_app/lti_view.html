@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Basic LTI App</title>
+<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+</head>
+<style>
+    th { background: lightgray}
+    /*tr:nth-child(even) {background: #FFF}
+    tr:nth-child(odd) {background: lightblue}*/
+    table {margin-left: 5px; }
+
+    .name {
+        font-size: 14px;
+        font-family: verdana;
+        color: maroon;
+        }
+
+     .email {
+        font-size: 12px;
+        font-family: verdana;
+     }   
+
+     .bio {
+        font-size: 11px;
+        font-family: georgia; 
+     }
+
+     h1, h2, h3 {
+        font-family: verdana;
+     }
+
+     .rosterEntry {
+        page-break-inside: avoid;
+     }
+
+     #printOptions {
+        font-family: verdana;
+        font-size: 11px;
+        margin-left: 30px;
+        margin-right: 25%;
+        margin-top: 1.5em;
+        float: right;
+     }
+
+     a.buttons {
+        display: inline-block;
+        text-transform: uppercase;
+        /*letter-spacing: 2px;*/
+        font-family: verdana;
+        font-size: 11px;
+        padding: 5px 15px;
+        border-radius: 5px;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        border: 1px solid rgba(0,0,0,0.3);
+        border-bottom-width: 3px;
+        background-color: #E48681;
+        border-color: rgba(0,0,0,0.3);
+        /*text-shadow: 0 1px 0 rgba(0,0,0,0.5);*/
+        color: black;
+    }
+
+    a.buttons:hover {
+        background-color: #DA4F49;
+        border-color: rgba(0,0,0,0.5);
+    }
+
+
+
+    @media print {
+    #facultyTable {page-break-after: always;}
+    }
+
+</style>
+<body>
+
+<br />
+
+
+                <!--Printing without splitting divs-
+                <script>
+                function printDiv(divName) {
+                     var printContents = document.getElementById(divName).innerHTML;
+                     var originalContents = document.body.innerHTML;
+                        document.body.innerHTML = printContents;
+                        window.print();
+                        document.body.innerHTML = originalContents;
+                }
+                </script>-->
+<div id="printOptions">
+    <a href="#" class="buttons" id="toggleFac">Toggle Faculty/ Staff</a><br />
+        <script>
+            $( "#toggleFac" ).click(function() {
+                $( "#facultyTable" ).toggle();
+            });
+        </script>
+
+    <br />
+
+    <!--<input type="button" onclick="printDiv('studentTable')" value="Print Photo Roster"><br>-->
+    <a href="#" class="buttons" id="printRoster">Print Photo Roster</a><br />
+        <script>
+            $( "#printRoster" ).click(function() {
+             var printContents = document.getElementById("bothTables").innerHTML;
+             var originalContents = document.body.innerHTML;
+                document.body.innerHTML = printContents;
+                window.print();
+                document.body.innerHTML = originalContents;
+            }
+            );
+        </script>
+</div>
+
+
+
+
+<div id="fullPrint">
+<!--    
+<table class="pr-header">
+<tbody>
+    <!--
+    <tr>
+        <td>
+            <img src="https://exed.hks.harvard.edu/canvas_elements/images/hkseeLogo_PR.png">
+        </td>
+    </tr>
+    -->
+    <tr>
+        <td>
+            <h2>{{ courseName.name }}</h2>
+            <h3>Photo Roster</h3>
+        </td>
+
+        <td>
+            
+        </td>
+
+    </tr>
+</tbody>
+</table>
+<div id="bothTables">
+<div id="facultyTable">
+    <h2>Faculty/ Staff</h2>
+<table>
+
+    {% for faculty in facultyGet %}
+    <!-- Replacing the empty pics with the HKS Shield - Thanks Isaac Andela-->
+    <script>
+        var avatarUrl = "{{ faculty.avatar_url }}";
+        var noPicSnip = "avatar-50.png";
+        var result = avatarUrl.indexOf(noPicSnip) > -1;
+        $("img").each(function(i, elem){
+            if ($(this).attr("src").contains(noPicSnip)) {
+                $(this).attr("src", "https://exed.hks.harvard.edu/canvas_elements/images/hksShield_PR.jpg");
+            }
+        });
+    </script>
+    <table class="rosterEntry"
+        cellpadding="0"
+        cellspacing="8"
+        align="center"
+        width="750"
+        border="0"
+        bgcolor="white">
+
+        <tr>
+            <td colspan="3">
+                    <img src="https://exed.hks.harvard.edu/canvas_elements/images/horizLine_PR.png"/ width="100%" height="1px" border="1">
+            </td>
+        </tr>
+
+        <tr>
+            <td align="center" valign="middle" width="160">
+                          
+                <div id="avatarUrlDiv">
+                    <img src="{{ faculty.avatar_url }}"/ border="1" height="130" width="130">
+                </div>
+
+            </td>
+           
+            <td valign="top" width="590" height="155">
+                <p class="name">
+                    <b>{{ faculty.name }}</b><br>
+                </p>
+
+                <p class="email">
+                    <b>{{ faculty.primary_email }}</b><br>   
+                </p>       
+            </td>
+        </tr>
+
+        <tr>
+            <td class ="bio" colspan="3">
+                {{ faculty.bio }}
+            </td>
+        </tr>
+
+    </table>
+
+    {% endfor %}   
+</table>    
+</div>
+
+<div id="studentTable">
+    <h2>Students/ Participants</h2>
+<table>
+    {% for user in userGet %}
+    <!-- Replacing the empty pics with the HKS Shield - Thank you to https://css-tricks.com/forums/users/IsaacAndela/-->
+    <script>
+        var avatarUrl = "{{ user.avatar_url }}";
+        var noPicSnip = "avatar-50.png";
+        var result = avatarUrl.indexOf(noPicSnip) > -1;
+        $("img").each(function(i, elem){
+            if ($(this).attr("src").contains(noPicSnip)) {
+                $(this).attr("src", "https://exed.hks.harvard.edu/canvas_elements/images/hksShield_PR.jpg");
+            }
+        });
+    </script>
+    <table class="rosterEntry"
+        cellpadding="0"
+        cellspacing="8"
+        align="center"
+        width="750"
+        border="0"
+        bgcolor="white">
+
+        <tr>
+            <td colspan="3">
+                    <img src="https://exed.hks.harvard.edu/canvas_elements/images/horizLine_PR.png"/ width="100%" height="1px" border="1">
+            </td>
+        </tr>
+
+        <tr>
+            <td align="center" valign="middle" width="160">
+                          
+                <div id="avatarUrlDiv">
+                    <img src="{{ user.avatar_url }}"/ border="1" height="130" width="130">
+                </div>
+
+            </td>
+           
+            <td valign="top" width="590" height="155">
+                <p class="name">
+                    <b>{{ user.name }}</b><br>
+                </p>
+
+                <p class="email">
+                    <b>{{ user.primary_email }}</b><br>   
+                </p>       
+            </td>
+        </tr>
+
+        <tr>
+            <td class ="bio" colspan="3">
+                {{ user.bio }}
+            </td>
+        </tr>
+
+    </table>
+
+    {% endfor %}   
+</table>    
+</div>
+</div>
+</div>
+
+
+
+</body>
+</html>
